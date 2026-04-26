@@ -31,6 +31,8 @@ Etapas principais:
 - quando a branch `main` passa nos testes, publica o relatorio Mochawesome no GitHub Pages:
   `https://pedromendes414.github.io/Projeto-Portif-lio-Pessoal---M2.0/`.
 
+Para o deploy visual funcionar, o GitHub Pages precisa estar habilitado em `Settings > Pages > Build and deployment > Source > GitHub Actions`. Enquanto isso nao estiver ativo, a CI continua passando e mantem o relatorio disponivel como artifact.
+
 ## Rotas implementadas
 
 - `POST /v1/auth/admin/login`

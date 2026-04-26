@@ -14,6 +14,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -32,10 +35,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -48,7 +51,7 @@ jobs:
 
       - name: Upload API test report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: api-test-report-node-${{ matrix.node-version }}
           path: reports/api
@@ -66,20 +69,50 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
+      - name: Check GitHub Pages configuration
+        id: pages
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          status_code=$(curl --silent --show-error --output /tmp/pages.json --write-out "%{http_code}" \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            "${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/pages")
+
+          if [ "${status_code}" = "200" ]; then
+            echo "enabled=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo "enabled=false" >> "${GITHUB_OUTPUT}"
+          {
+            echo "## GitHub Pages nao configurado"
+            echo ""
+            echo "Os testes passaram e o relatorio foi salvo como artifact, mas o deploy visual foi pulado porque o GitHub Pages ainda nao esta habilitado para este repositorio."
+            echo ""
+            echo "Para habilitar: Settings > Pages > Build and deployment > Source > GitHub Actions."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/configure-pages@v6
 
       - name: Download Node.js 22 report
-        uses: actions/download-artifact@v4
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/download-artifact@v8
         with:
           name: api-test-report-node-22.x
           path: pages-report
 
       - name: Upload report to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/upload-pages-artifact@v5
         with:
           path: pages-report
 
       - name: Deploy report to GitHub Pages
+        if: steps.pages.outputs.enabled == 'true'
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
