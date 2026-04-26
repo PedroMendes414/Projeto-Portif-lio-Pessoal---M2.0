@@ -27,7 +27,9 @@ Etapas principais:
 - instala dependencias com `npm ci`, respeitando o `package-lock.json`;
 - roda a suite de API com `npm run test:ci`;
 - valida o projeto em Node.js 20.x e 22.x;
-- publica o relatorio `reports/api` como artifact por 7 dias, inclusive quando os testes falham.
+- publica o relatorio `reports/api` como artifact por 7 dias, inclusive quando os testes falham;
+- quando a branch `main` passa nos testes, publica o relatorio Mochawesome no GitHub Pages:
+  `https://pedromendes414.github.io/Projeto-Portif-lio-Pessoal---M2.0/`.
 
 ## Rotas implementadas
 
