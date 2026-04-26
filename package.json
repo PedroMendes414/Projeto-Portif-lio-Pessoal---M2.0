@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
+    "test": "npm run test:api",
+    "test:ci": "npm run test:api",
     "test:api": "mocha \"tests/api/specs/**/*.spec.js\" --reporter mochawesome --reporter-options reportDir=reports/api,reportFilename=index,overwrite=true,html=true,json=true"
   },
   "keywords": [

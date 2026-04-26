@@ -10,6 +10,25 @@ npm start
 
 A API sobe por padrao em `http://localhost:3000`.
 
+## Testes
+
+```bash
+npm test
+```
+
+Os testes de API sobem a aplicacao em uma porta livre durante a execucao e geram um relatorio Mochawesome em `reports/api`.
+
+## Integracao continua
+
+O workflow `.github/workflows/ci.yml` executa em pushes e pull requests para a branch `main`, alem de permitir execucao manual pela aba Actions do GitHub.
+
+Etapas principais:
+
+- instala dependencias com `npm ci`, respeitando o `package-lock.json`;
+- roda a suite de API com `npm run test:ci`;
+- valida o projeto em Node.js 20.x e 22.x;
+- publica o relatorio `reports/api` como artifact por 7 dias, inclusive quando os testes falham.
+
 ## Rotas implementadas
 
 - `POST /v1/auth/admin/login`
