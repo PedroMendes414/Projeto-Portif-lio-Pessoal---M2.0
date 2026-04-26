@@ -1,0 +1,30 @@
+{
+  "name": "cashback-marketplace-api",
+  "version": "1.0.0",
+  "description": "API REST em Express com banco de dados em memoria para gestao de campanhas de cashback.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test:api": "mocha \"tests/api/specs/**/*.spec.js\" --reporter mochawesome --reporter-options reportDir=reports/api,reportFilename=index,overwrite=true,html=true,json=true"
+  },
+  "keywords": [
+    "express",
+    "rest",
+    "cashback",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "swagger-ui-express": "^5.0.1",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "mocha": "^10.7.3",
+    "mochawesome": "^7.1.4"
+  }
+}

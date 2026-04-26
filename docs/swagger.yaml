@@ -1,0 +1,957 @@
+openapi: 3.0.3
+info:
+  title: API de Gestao de Campanhas de Cashback para Marketplace
+  version: 1.0.0
+  description: |
+    Especificacao REST para o backend da aplicacao descrita no epico KAN-4.
+
+    Objetivos cobertos:
+      - login administrativo para gestores
+      - login de usuario comum
+      - cadastro de usuario comum
+      - listagem e criacao de campanhas de cashback com status
+      - listagem de campanhas visiveis para o usuario autenticado
+      - exclusao global por admin e exclusao da lista pessoal pelo usuario comum
+      - simulacao de cashback baseada em campanhas ativas
+      - validacoes de negocio e controle de perfil de acesso
+  license:
+    name: Proprietary
+    url: https://example.com/licenses/proprietary
+servers:
+  - url: https://api.marketplace.local/v1
+    description: Ambiente padrao
+tags:
+  - name: Autenticacao
+    description: Operacoes de autenticacao e emissao de token para gestores e usuarios comuns.
+  - name: Usuarios
+    description: Cadastro, autenticacao e consulta de contas de usuarios finais.
+  - name: Campanhas
+    description: Gestao administrativa das campanhas de cashback.
+  - name: Simulacoes
+    description: Simulacao de cashback com base nas campanhas elegiveis.
+paths:
+  /auth/admin/login:
+    post:
+      tags:
+        - Autenticacao
+      summary: Realiza login administrativo
+      description: Autentica gestores e retorna token JWT com perfil de acesso administrativo.
+      operationId: loginAdmin
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLoginRequest'
+            examples:
+              default:
+                value:
+                  email: gestor@marketplace.com
+                  password: "<SECRET>"
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /auth/user/login:
+    post:
+      tags:
+        - Autenticacao
+      summary: Realiza login do usuario comum
+      description: Autentica cliente final e retorna token JWT com perfil de acesso comum.
+      operationId: loginUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+            examples:
+              default:
+                value:
+                  email: cliente@marketplace.com
+                  password: "cliente123"
+      responses:
+        '200':
+          description: Login realizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/register:
+    post:
+      tags:
+        - Usuarios
+      summary: Cadastra um usuario comum
+      description: Cria uma conta de cliente para participacao nas campanhas de cashback.
+      operationId: registerUser
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+      responses:
+        '201':
+          description: Usuario cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '409':
+          description: Email ou documento ja cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /users/me/campaigns:
+    get:
+      tags:
+        - Usuarios
+      summary: Lista campanhas do usuario autenticado
+      description: |
+        Retorna apenas campanhas visiveis para o usuario comum autenticado, conforme segmentacao,
+        estado, lista de clientes elegiveis e status da campanha.
+      operationId: listMyCampaigns
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StatusQueryParam'
+        - $ref: '#/components/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/SizeQueryParam'
+        - name: sellerId
+          in: query
+          description: Identificador do seller ou marketplace participante.
+          schema:
+            type: string
+        - name: activeAt
+          in: query
+          description: Filtra campanhas visiveis na data informada.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Lista paginada de campanhas visiveis ao usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignPage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
+  /users/me/campaigns/{campaignId}:
+    delete:
+      tags:
+        - Usuarios
+      summary: Exclui campanha da lista do usuario autenticado
+      description: |
+        Permite ao usuario comum remover apenas da propria visualizacao uma campanha elegivel para ele.
+        A exclusao nao remove a campanha globalmente do marketplace.
+      operationId: deleteMyCampaign
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignIdPathParam'
+      responses:
+        '204':
+          description: Campanha removida da lista do usuario com sucesso
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /campaigns:
+    get:
+      tags:
+        - Campanhas
+      summary: Lista campanhas de cashback
+      description: |
+        Retorna campanhas com filtros por status, periodo de vigencia e marketplace.
+        Requer autenticacao administrativa.
+      operationId: listCampaigns
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/StatusQueryParam'
+        - $ref: '#/components/parameters/PageQueryParam'
+        - $ref: '#/components/parameters/SizeQueryParam'
+        - name: sellerId
+          in: query
+          description: Identificador do seller ou marketplace participante.
+          schema:
+            type: string
+        - name: activeAt
+          in: query
+          description: Filtra campanhas vigentes na data informada.
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Lista paginada de campanhas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignPage'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+    post:
+      tags:
+        - Campanhas
+      summary: Cria uma campanha de cashback
+      description: |
+        Cria uma nova campanha com regras de negocio.
+        Apenas gestores autenticados podem executar esta operacao.
+      operationId: createCampaign
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '201':
+          description: Campanha criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          description: Conflito com outra campanha ativa ou agendada para o mesmo escopo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /campaigns/{campaignId}:
+    get:
+      tags:
+        - Campanhas
+      summary: Consulta detalhes de uma campanha
+      operationId: getCampaignById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignIdPathParam'
+      responses:
+        '200':
+          description: Dados da campanha
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags:
+        - Campanhas
+      summary: Exclui uma campanha globalmente
+      description: |
+        Remove definitivamente uma campanha do marketplace.
+        Apenas administradores autenticados podem executar esta operacao.
+      operationId: deleteCampaign
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignIdPathParam'
+      responses:
+        '204':
+          description: Campanha excluida com sucesso
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - Campanhas
+      summary: Atualiza uma campanha
+      description: |
+        Permite editar campanhas em rascunho, agendadas ou pausadas.
+        Campanhas expiradas, arquivadas ou canceladas nao podem ser alteradas.
+      operationId: updateCampaign
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Campanha atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Regras impedem a alteracao da campanha no status atual
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /campaigns/{campaignId}/status:
+    patch:
+      tags:
+        - Campanhas
+      summary: Altera o status de uma campanha
+      description: |
+        Permite transicoes controladas de status, como ativar, pausar, cancelar e arquivar.
+        Requer perfil administrativo.
+      operationId: changeCampaignStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignIdPathParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeCampaignStatusRequest'
+      responses:
+        '200':
+          description: Status alterado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+        '409':
+          description: Transicao de status invalida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /simulations/cashback:
+    post:
+      tags:
+        - Simulacoes
+      summary: Simula cashback aplicavel a uma compra
+      description: |
+        Calcula o cashback com base nas campanhas ativas e nas regras de elegibilidade.
+        A simulacao nao persiste transacao financeira.
+      operationId: simulateCashback
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CashbackSimulationRequest'
+      responses:
+        '200':
+          description: Simulacao realizada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CashbackSimulationResponse'
+        '404':
+          description: Nenhuma campanha elegivel encontrada para o contexto informado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    CampaignIdPathParam:
+      name: campaignId
+      in: path
+      required: true
+      description: Identificador unico da campanha.
+      schema:
+        type: string
+        format: uuid
+    StatusQueryParam:
+      name: status
+      in: query
+      description: Filtra campanhas por status.
+      schema:
+        $ref: '#/components/schemas/CampaignStatus'
+    PageQueryParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+    SizeQueryParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+  responses:
+    UnauthorizedError:
+      description: Credenciais invalidas ou token ausente
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ForbiddenError:
+      description: Perfil sem permissao para executar a operacao
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundError:
+      description: Recurso nao encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ValidationError:
+      description: Violacao de regras de validacao da requisicao
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ValidationErrorResponse'
+
+  schemas:
+    AdminLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    UserLoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+
+    AuthTokenResponse:
+      type: object
+      required:
+        - accessToken
+        - tokenType
+        - expiresIn
+        - user
+      properties:
+        accessToken:
+          type: string
+        tokenType:
+          type: string
+          example: Bearer
+        expiresIn:
+          type: integer
+          example: 3600
+        user:
+          oneOf:
+            - $ref: '#/components/schemas/AdminUser'
+            - $ref: '#/components/schemas/AuthenticatedUser'
+
+    AdminUser:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - role
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum:
+            - ADMIN
+            - MANAGER
+
+    UserRegistrationRequest:
+      type: object
+      required:
+        - fullName
+        - email
+        - document
+        - password
+      properties:
+        fullName:
+          type: string
+          minLength: 3
+          maxLength: 120
+        email:
+          type: string
+          format: email
+        document:
+          type: string
+          description: Documento do usuario, como CPF.
+          example: "12345678900"
+        password:
+          type: string
+          minLength: 8
+        phone:
+          type: string
+          example: "11999999999"
+        birthDate:
+          type: string
+          format: date
+        state:
+          type: string
+          example: SP
+
+    UserResponse:
+      type: object
+      required:
+        - id
+        - fullName
+        - email
+        - document
+        - status
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        document:
+          type: string
+        state:
+          type: string
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - INACTIVE
+        createdAt:
+          type: string
+          format: date-time
+
+    AuthenticatedUser:
+      allOf:
+        - $ref: '#/components/schemas/UserResponse'
+        - type: object
+          required:
+            - role
+          properties:
+            role:
+              type: string
+              enum:
+                - CUSTOMER
+
+    CreateCampaignRequest:
+      allOf:
+        - $ref: '#/components/schemas/CampaignUpsert'
+        - type: object
+          required:
+            - name
+            - description
+            - validity
+            - cashbackRule
+            - audience
+
+    UpdateCampaignRequest:
+      allOf:
+        - $ref: '#/components/schemas/CampaignUpsert'
+
+    CampaignUpsert:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 3
+          maxLength: 120
+        description:
+          type: string
+          minLength: 10
+          maxLength: 1000
+        sellerId:
+          type: string
+          description: Identificador do seller ou escopo do marketplace.
+        validity:
+          $ref: '#/components/schemas/CampaignValidity'
+        cashbackRule:
+          $ref: '#/components/schemas/CashbackRule'
+        audience:
+          $ref: '#/components/schemas/CampaignAudience'
+        stackable:
+          type: boolean
+          default: false
+          description: Define se a campanha pode ser combinada com outras promocoes elegiveis.
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 999
+          default: 100
+
+    CampaignValidity:
+      type: object
+      required:
+        - startAt
+        - endAt
+      properties:
+        startAt:
+          type: string
+          format: date-time
+        endAt:
+          type: string
+          format: date-time
+      description: O periodo final deve ser maior que o inicial.
+
+    CashbackRule:
+      type: object
+      required:
+        - type
+        - value
+        - currency
+      properties:
+        type:
+          type: string
+          enum:
+            - PERCENTAGE
+            - FIXED
+        value:
+          type: number
+          format: double
+          minimum: 0.01
+          example: 15
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: BRL
+        minPurchaseAmount:
+          type: number
+          format: double
+          minimum: 0
+          example: 100
+        maxCashbackAmount:
+          type: number
+          format: double
+          minimum: 0
+          example: 250
+        firstPurchaseOnly:
+          type: boolean
+          default: false
+        allowedPaymentMethods:
+          type: array
+          items:
+            type: string
+            enum:
+              - CREDIT_CARD
+              - PIX
+              - BOLETO
+              - WALLET
+
+    CampaignAudience:
+      type: object
+      properties:
+        segment:
+          type: string
+          enum:
+            - ALL
+            - NEW_USERS
+            - PREMIUM
+            - SELLER_DEFINED
+          default: ALL
+        states:
+          type: array
+          items:
+            type: string
+            example: SP
+        customerIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    CampaignResponse:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - status
+        - validity
+        - cashbackRule
+        - audience
+        - stackable
+        - priority
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        sellerId:
+          type: string
+        status:
+          $ref: '#/components/schemas/CampaignStatus'
+        validity:
+          $ref: '#/components/schemas/CampaignValidity'
+        cashbackRule:
+          $ref: '#/components/schemas/CashbackRule'
+        audience:
+          $ref: '#/components/schemas/CampaignAudience'
+        stackable:
+          type: boolean
+        priority:
+          type: integer
+        createdBy:
+          $ref: '#/components/schemas/AdminUser'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    CampaignPage:
+      type: object
+      required:
+        - content
+        - page
+        - size
+        - totalElements
+        - totalPages
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignResponse'
+        page:
+          type: integer
+        size:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+
+    CampaignStatus:
+      type: string
+      enum:
+        - DRAFT
+        - SCHEDULED
+        - ACTIVE
+        - PAUSED
+        - EXPIRED
+        - CANCELLED
+        - ARCHIVED
+
+    ChangeCampaignStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/CampaignStatus'
+        reason:
+          type: string
+          maxLength: 255
+
+    CashbackSimulationRequest:
+      type: object
+      required:
+        - customerId
+        - sellerId
+        - purchaseAmount
+        - purchaseDate
+        - paymentMethod
+      properties:
+        customerId:
+          type: string
+          format: uuid
+        sellerId:
+          type: string
+        purchaseAmount:
+          type: number
+          format: double
+          minimum: 0.01
+        purchaseDate:
+          type: string
+          format: date-time
+        paymentMethod:
+          type: string
+          enum:
+            - CREDIT_CARD
+            - PIX
+            - BOLETO
+            - WALLET
+        isFirstPurchase:
+          type: boolean
+          default: false
+        state:
+          type: string
+          example: SP
+
+    CashbackSimulationResponse:
+      type: object
+      required:
+        - eligible
+        - purchaseAmount
+        - cashbackAmount
+        - appliedCampaigns
+        - processedAt
+      properties:
+        eligible:
+          type: boolean
+        purchaseAmount:
+          type: number
+          format: double
+        cashbackAmount:
+          type: number
+          format: double
+        currency:
+          type: string
+          example: BRL
+        appliedCampaigns:
+          type: array
+          items:
+            type: object
+            required:
+              - campaignId
+              - campaignName
+              - cashbackAmount
+            properties:
+              campaignId:
+                type: string
+                format: uuid
+              campaignName:
+                type: string
+              cashbackAmount:
+                type: number
+                format: double
+        deniedReasons:
+          type: array
+          items:
+            type: string
+          description: Lista motivos de inelegibilidade quando aplicavel.
+        processedAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+        - timestamp
+      properties:
+        code:
+          type: string
+          example: BUSINESS_RULE_VIOLATION
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    ValidationErrorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ErrorResponse'
+        - type: object
+          properties:
+            fieldErrors:
+              type: array
+              items:
+                type: object
+                required:
+                  - field
+                  - message
+                properties:
+                  field:
+                    type: string
+                  message:
+                    type: string
