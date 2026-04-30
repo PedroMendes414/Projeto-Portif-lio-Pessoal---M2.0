@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Relatorio de performance k6</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 32px; color: #1f2937; }
+    h1 { margin-bottom: 4px; }
+    .muted { color: #6b7280; }
+    table { border-collapse: collapse; width: 100%; margin-top: 24px; }
+    th, td { border: 1px solid #d1d5db; padding: 10px; text-align: left; }
+    th { background: #f3f4f6; }
+    .pass { color: #047857; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <h1>Relatorio de performance k6</h1>
+  <p class="muted">Cashback Marketplace API - principais endpoints do Swagger.</p>
+  <p>Status geral: <span class="pass">executado</span></p>
+  <table>
+    <thead><tr><th>Metrica</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>HTTP duration p95</td><td>4.51 ms</td></tr>
+<tr><td>HTTP duration avg</td><td>2.26 ms</td></tr>
+<tr><td>HTTP failed rate</td><td>0.00</td></tr>
+<tr><td>Requests</td><td>923.00</td></tr>
+<tr><td>Iterations</td><td>115.00</td></tr>
+<tr><td>Business success rate</td><td>1.00</td></tr>
+<tr><td>Campaign creation p95</td><td>4.10 ms</td></tr>
+    </tbody>
+  </table>
+  <h2>Thresholds</h2>
+  <pre>{
+  &quot;http_req_tls_handshaking&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;p(95)&quot;: 0,
+      &quot;avg&quot;: 0,
+      &quot;min&quot;: 0,
+      &quot;med&quot;: 0,
+      &quot;max&quot;: 0,
+      &quot;p(90)&quot;: 0
+    }
+  },
+  &quot;http_req_receiving&quot;: {
+    &quot;values&quot;: {
+      &quot;med&quot;: 0.4911,
+      &quot;max&quot;: 3.3178,
+      &quot;p(90)&quot;: 0.96882,
+      &quot;p(95)&quot;: 1.00192,
+      &quot;avg&quot;: 0.4458761646803897,
+      &quot;min&quot;: 0
+    },
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;
+  },
+  &quot;data_sent&quot;: {
+    &quot;type&quot;: &quot;counter&quot;,
+    &quot;contains&quot;: &quot;data&quot;,
+    &quot;values&quot;: {
+      &quot;count&quot;: 336757,
+      &quot;rate&quot;: 8252.445548230715
+    }
+  },
+  &quot;http_req_duration&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;avg&quot;: 2.2584105092091016,
+      &quot;min&quot;: 0,
+      &quot;med&quot;: 1.9149,
+      &quot;max&quot;: 34.6269,
+      &quot;p(90)&quot;: 3.6430000000000002,
+      &quot;p(95)&quot;: 4.50558
+    },
+    &quot;thresholds&quot;: {
+      &quot;p(95)&lt;750&quot;: {
+        &quot;ok&quot;: true
+      }
+    }
+  },
+  &quot;http_req_connecting&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;avg&quot;: 0.010962513542795232,
+      &quot;min&quot;: 0,
+      &quot;med&quot;: 0,
+      &quot;max&quot;: 5.0238,
+      &quot;p(90)&quot;: 0,
+      &quot;p(95)&quot;: 0
+    }
+  },
+  &quot;data_received&quot;: {
+    &quot;type&quot;: &quot;counter&quot;,
+    &quot;contains&quot;: &quot;data&quot;,
+    &quot;values&quot;: {
+      &quot;count&quot;: 3787249,
+      &quot;rate&quot;: 92808.95764628865
+    }
+  },
+  &quot;vus&quot;: {
+    &quot;type&quot;: &quot;gauge&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;value&quot;: 1,
+      &quot;min&quot;: 1,
+      &quot;max&quot;: 5
+    }
+  },
+  &quot;http_req_sending&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;med&quot;: 0,
+      &quot;max&quot;: 1.1461,
+      &quot;p(90)&quot;: 0,
+      &quot;p(95)&quot;: 0,
+      &quot;avg&quot;: 0.014055362946912241,
+      &quot;min&quot;: 0
+    }
+  },
+  &quot;http_req_blocked&quot;: {
+    &quot;values&quot;: {
+      &quot;med&quot;: 0,
+      &quot;max&quot;: 5.0238,
+      &quot;p(90)&quot;: 0,
+      &quot;p(95)&quot;: 0,
+      &quot;avg&quot;: 0.014989057421451788,
+      &quot;min&quot;: 0
+    },
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;
+  },
+  &quot;created_campaign_duration&quot;: {
+    &quot;thresholds&quot;: {
+      &quot;p(95)&lt;900&quot;: {
+        &quot;ok&quot;: true
+      }
+    },
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;avg&quot;: 2.2647913043478254,
+      &quot;min&quot;: 0.5435,
+      &quot;med&quot;: 1.9757,
+      &quot;max&quot;: 6.9865,
+      &quot;p(90)&quot;: 3.4655800000000005,
+      &quot;p(95)&quot;: 4.095149999999999
+    }
+  },
+  &quot;http_req_waiting&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;avg&quot;: 1.7984789815817988,
+      &quot;min&quot;: 0,
+      &quot;med&quot;: 1.5556,
+      &quot;max&quot;: 34.6269,
+      &quot;p(90)&quot;: 3.4766400000000037,
+      &quot;p(95)&quot;: 4.029329999999996
+    }
+  },
+  &quot;business_success_rate&quot;: {
+    &quot;type&quot;: &quot;rate&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;passes&quot;: 920,
+      &quot;fails&quot;: 0,
+      &quot;rate&quot;: 1
+    },
+    &quot;thresholds&quot;: {
+      &quot;rate&gt;0.95&quot;: {
+        &quot;ok&quot;: true
+      }
+    }
+  },
+  &quot;http_req_duration{expected_response:true}&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;p(90)&quot;: 3.6430000000000002,
+      &quot;p(95)&quot;: 4.50558,
+      &quot;avg&quot;: 2.2584105092091016,
+      &quot;min&quot;: 0,
+      &quot;med&quot;: 1.9149,
+      &quot;max&quot;: 34.6269
+    }
+  },
+  &quot;checks&quot;: {
+    &quot;type&quot;: &quot;rate&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;rate&quot;: 1,
+      &quot;passes&quot;: 1495,
+      &quot;fails&quot;: 0
+    }
+  },
+  &quot;vus_max&quot;: {
+    &quot;type&quot;: &quot;gauge&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;min&quot;: 5,
+      &quot;max&quot;: 5,
+      &quot;value&quot;: 5
+    }
+  },
+  &quot;iterations&quot;: {
+    &quot;type&quot;: &quot;counter&quot;,
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;rate&quot;: 2.8181485107853206,
+      &quot;count&quot;: 115
+    }
+  },
+  &quot;http_req_failed&quot;: {
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;rate&quot;: 0,
+      &quot;passes&quot;: 0,
+      &quot;fails&quot;: 923
+    },
+    &quot;thresholds&quot;: {
+      &quot;rate&lt;0.05&quot;: {
+        &quot;ok&quot;: true
+      }
+    },
+    &quot;type&quot;: &quot;rate&quot;
+  },
+  &quot;iteration_duration&quot;: {
+    &quot;type&quot;: &quot;trend&quot;,
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;avg&quot;: 1019.4483886956526,
+      &quot;min&quot;: 1011.8752,
+      &quot;med&quot;: 1018.0219,
+      &quot;max&quot;: 1057.8131,
+      &quot;p(90)&quot;: 1022.9290199999999,
+      &quot;p(95)&quot;: 1030.73
+    }
+  },
+  &quot;http_reqs&quot;: {
+    &quot;contains&quot;: &quot;default&quot;,
+    &quot;values&quot;: {
+      &quot;rate&quot;: 22.618705003955224,
+      &quot;count&quot;: 923
+    },
+    &quot;type&quot;: &quot;counter&quot;
+  },
+  &quot;group_duration&quot;: {
+    &quot;contains&quot;: &quot;time&quot;,
+    &quot;values&quot;: {
+      &quot;med&quot;: 5.7656,
+      &quot;max&quot;: 30.2714,
+      &quot;p(90)&quot;: 8.601040000000001,
+      &quot;p(95)&quot;: 9.54428,
+      &quot;avg&quot;: 6.244510144927538,
+      &quot;min&quot;: 2.8648
+    },
+    &quot;type&quot;: &quot;trend&quot;
+  }
+}</pre>
+</body>
+</html>

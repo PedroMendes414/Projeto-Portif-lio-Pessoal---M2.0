@@ -1,0 +1,379 @@
+{
+  "root_group": {
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [
+      {
+        "id": "30a75f17d8bd530a30718f848cdf95f7",
+        "groups": [],
+        "checks": [
+            {
+              "name": "health returns 200",
+              "path": "::public health and authentication::health returns 200",
+              "id": "cd901e0017ccc7b233db1a3550b5f477",
+              "passes": 115,
+              "fails": 0
+            },
+            {
+              "id": "66c336aaffeed25c33e8536604b027ac",
+              "passes": 115,
+              "fails": 0,
+              "name": "admin login returns token",
+              "path": "::public health and authentication::admin login returns token"
+            },
+            {
+              "name": "user login returns token",
+              "path": "::public health and authentication::user login returns token",
+              "id": "6a6a1d128d1584ef5ea0b151f17c4d72",
+              "passes": 115,
+              "fails": 0
+            }
+          ],
+        "name": "public health and authentication",
+        "path": "::public health and authentication"
+      },
+      {
+        "name": "campaign administrative endpoints",
+        "path": "::campaign administrative endpoints",
+        "id": "1018d836a2a252813501c64a146d2e11",
+        "groups": [],
+        "checks": [
+            {
+              "path": "::campaign administrative endpoints::admin campaign list returns 200",
+              "id": "c98e7c55ad04734c32255e3497f298a2",
+              "passes": 115,
+              "fails": 0,
+              "name": "admin campaign list returns 200"
+            },
+            {
+              "name": "admin campaign list has content",
+              "path": "::campaign administrative endpoints::admin campaign list has content",
+              "id": "1e4cfaea94c199db0930fd64419f9a57",
+              "passes": 115,
+              "fails": 0
+            },
+            {
+              "fails": 0,
+              "name": "campaign detail returns 200",
+              "path": "::campaign administrative endpoints::campaign detail returns 200",
+              "id": "287984258d223c6b7345017d55475ed9",
+              "passes": 115
+            },
+            {
+              "name": "campaign detail matches setup campaign",
+              "path": "::campaign administrative endpoints::campaign detail matches setup campaign",
+              "id": "e9fed48edfc340a9063b6cd5b3776762",
+              "passes": 115,
+              "fails": 0
+            },
+            {
+              "name": "campaign creation returns 201",
+              "path": "::campaign administrative endpoints::campaign creation returns 201",
+              "id": "589ea9b9165540525b766b420c5f1c7f",
+              "passes": 115,
+              "fails": 0
+            },
+            {
+              "fails": 0,
+              "name": "campaign creation returns id",
+              "path": "::campaign administrative endpoints::campaign creation returns id",
+              "id": "b867a757d10d9e863fc26c8be9c53b30",
+              "passes": 115
+            }
+          ]
+      },
+      {
+        "path": "::customer campaign and simulation endpoints",
+        "id": "b18b9f5bc98808ce1fcf193de66f0f36",
+        "groups": [],
+        "checks": [
+            {
+              "fails": 0,
+              "name": "user campaign list returns 200",
+              "path": "::customer campaign and simulation endpoints::user campaign list returns 200",
+              "id": "14af297f18c0f4865376811dc664ae6e",
+              "passes": 115
+            },
+            {
+              "id": "fd040618dd430029ed79b525b050b569",
+              "passes": 115,
+              "fails": 0,
+              "name": "user campaign list has content",
+              "path": "::customer campaign and simulation endpoints::user campaign list has content"
+            },
+            {
+              "name": "cashback simulation returns 200",
+              "path": "::customer campaign and simulation endpoints::cashback simulation returns 200",
+              "id": "c65d1154f2c91e5919f4d284528a9c62",
+              "passes": 115,
+              "fails": 0
+            },
+            {
+              "id": "5633e3c4d19dd27e563b6177179e763a",
+              "passes": 115,
+              "fails": 0,
+              "name": "cashback simulation is eligible",
+              "path": "::customer campaign and simulation endpoints::cashback simulation is eligible"
+            }
+          ],
+        "name": "customer campaign and simulation endpoints"
+      }
+    ],
+    "checks": [],
+    "name": ""
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(90)",
+      "p(95)"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  },
+  "state": {
+    "isStdOutTTY": false,
+    "isStdErrTTY": false,
+    "testRunDurationMs": 40806.9339
+  },
+  "metrics": {
+    "business_success_rate": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "fails": 0,
+        "rate": 1,
+        "passes": 920
+      },
+      "thresholds": {
+        "rate>0.95": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_duration{expected_response:true}": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 1.9149,
+        "max": 34.6269,
+        "p(90)": 3.6430000000000002,
+        "p(95)": 4.50558,
+        "avg": 2.2584105092091016,
+        "min": 0
+      }
+    },
+    "checks": {
+      "values": {
+        "rate": 1,
+        "passes": 1495,
+        "fails": 0
+      },
+      "type": "rate",
+      "contains": "default"
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 5,
+        "min": 5,
+        "max": 5
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 115,
+        "rate": 2.8181485107853206
+      }
+    },
+    "http_req_failed": {
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "passes": 0,
+        "fails": 923
+      },
+      "thresholds": {
+        "rate<0.05": {
+          "ok": true
+        }
+      },
+      "type": "rate"
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 1018.0219,
+        "max": 1057.8131,
+        "p(90)": 1022.9290199999999,
+        "p(95)": 1030.73,
+        "avg": 1019.4483886956526,
+        "min": 1011.8752
+      }
+    },
+    "http_reqs": {
+      "values": {
+        "count": 923,
+        "rate": 22.618705003955224
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "group_duration": {
+      "contains": "time",
+      "values": {
+        "med": 5.7656,
+        "max": 30.2714,
+        "p(90)": 8.601040000000001,
+        "p(95)": 9.54428,
+        "avg": 6.244510144927538,
+        "min": 2.8648
+      },
+      "type": "trend"
+    },
+    "http_req_tls_handshaking": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 0,
+        "max": 0,
+        "p(90)": 0,
+        "p(95)": 0,
+        "avg": 0,
+        "min": 0
+      }
+    },
+    "http_req_receiving": {
+      "contains": "time",
+      "values": {
+        "avg": 0.4458761646803897,
+        "min": 0,
+        "med": 0.4911,
+        "max": 3.3178,
+        "p(90)": 0.96882,
+        "p(95)": 1.00192
+      },
+      "type": "trend"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "rate": 8252.445548230715,
+        "count": 336757
+      }
+    },
+    "http_req_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 2.2584105092091016,
+        "min": 0,
+        "med": 1.9149,
+        "max": 34.6269,
+        "p(90)": 3.6430000000000002,
+        "p(95)": 4.50558
+      },
+      "thresholds": {
+        "p(95)<750": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 0,
+        "avg": 0.010962513542795232,
+        "min": 0,
+        "med": 0,
+        "max": 5.0238,
+        "p(90)": 0
+      }
+    },
+    "data_received": {
+      "values": {
+        "count": 3787249,
+        "rate": 92808.95764628865
+      },
+      "type": "counter",
+      "contains": "data"
+    },
+    "vus": {
+      "values": {
+        "value": 1,
+        "min": 1,
+        "max": 5
+      },
+      "type": "gauge",
+      "contains": "default"
+    },
+    "http_req_sending": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.014055362946912241,
+        "min": 0,
+        "med": 0,
+        "max": 1.1461,
+        "p(90)": 0,
+        "p(95)": 0
+      }
+    },
+    "http_req_blocked": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 0.014989057421451788,
+        "min": 0,
+        "med": 0,
+        "max": 5.0238,
+        "p(90)": 0,
+        "p(95)": 0
+      }
+    },
+    "created_campaign_duration": {
+      "type": "trend",
+      "contains": "default",
+      "values": {
+        "max": 6.9865,
+        "p(90)": 3.4655800000000005,
+        "p(95)": 4.095149999999999,
+        "avg": 2.2647913043478254,
+        "min": 0.5435,
+        "med": 1.9757
+      },
+      "thresholds": {
+        "p(95)<900": {
+          "ok": true
+        }
+      }
+    },
+    "http_req_waiting": {
+      "values": {
+        "max": 34.6269,
+        "p(90)": 3.4766400000000037,
+        "p(95)": 4.029329999999996,
+        "avg": 1.7984789815817988,
+        "min": 0,
+        "med": 1.5556
+      },
+      "type": "trend",
+      "contains": "time"
+    }
+  },
+  "setup_data": {
+    "campaignId": "afbd9e1f-1ddb-4e29-9e2b-22fd3401c0ba",
+    "sellerId": "seller-perf-setup-1777514128984",
+    "adminToken": "[redacted]",
+    "userToken": "[redacted]"
+  }
+}

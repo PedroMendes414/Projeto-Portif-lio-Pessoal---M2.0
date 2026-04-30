@@ -8,7 +8,9 @@
     "dev": "node --watch src/server.js",
     "test": "npm run test:api",
     "test:ci": "npm run test:api",
-    "test:api": "mocha \"tests/api/specs/**/*.spec.js\" --reporter mochawesome --reporter-options reportDir=reports/api,reportFilename=index,overwrite=true,html=true,json=true"
+    "test:api": "mocha \"tests/api/specs/**/*.spec.js\" --reporter mochawesome --reporter-options reportDir=reports/api,reportFilename=index,overwrite=true,html=true,json=true",
+    "test:performance": "node scripts/run-performance-tests.js",
+    "test:perf": "npm run test:performance"
   },
   "keywords": [
     "express",

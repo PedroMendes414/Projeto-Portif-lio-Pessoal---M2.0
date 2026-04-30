@@ -18,6 +18,34 @@ npm test
 
 Os testes de API sobem a aplicacao em uma porta livre durante a execucao e geram um relatorio Mochawesome em `reports/api`.
 
+## Performance
+
+Os testes de performance usam k6 e cobrem os principais endpoints do Swagger: healthcheck, login administrativo, login de usuario comum, listagem/criacao/detalhe de campanhas, listagem de campanhas do usuario autenticado e simulacao de cashback.
+
+Pre-requisito:
+
+```bash
+k6 version
+```
+
+Execucao:
+
+```bash
+npm run test:performance
+```
+
+O comando sobe a API localmente, executa um cenario smoke com rampa ate 5 VUs e gera os relatorios em:
+
+- `reports/performance/summary.html`
+- `reports/performance/summary.json`
+
+Thresholds atuais:
+
+- `http_req_failed < 5%`
+- `http_req_duration p95 < 750ms`
+- `business_success_rate > 95%`
+- `created_campaign_duration p95 < 900ms`
+
 ## Integracao continua
 
 O workflow `.github/workflows/ci.yml` executa em pushes e pull requests para a branch `main`, alem de permitir execucao manual pela aba Actions do GitHub.
