@@ -1,5 +1,5 @@
 # Cashback Marketplace API
-API REST em JavaScript com Express e banco de dados em memoria para implementar o contrato OpenAPI definido em `docs/swagger.yaml`.
+Esse é o projeto de portfólio pessoal desenvolvida como parte da mentoria 2.0 em testes de software, API REST em JavaScript com Express e banco de dados em memoria para implementar um sistema de cashback para Marketplace definido em `docs/swagger.yaml`.
 
 ## Como executar
 
